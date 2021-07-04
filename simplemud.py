@@ -38,11 +38,11 @@ else:
     stanze = {
         "Taverna": {
             "descrizione": "Sei in una confortevole taverna riscaldata da un caminetto",
-            "uscite": {"esterno": "Esterno"},
+            "uscite": {"Esterno",}
         },
         "Esterno": {
             "descrizione": "Ti trovi fuori da una taverna. Sta piovendo.",
-            "uscite": {"interno": "Taverna"},
+            "uscite": {"Taverna",}
         }
     }
     pickle.dump( stanze, open( "stanze.p", "wb") )
@@ -148,7 +148,7 @@ while True:
 
             # gestisci ogni giocatore nel gioco
             for gid, gio in giocatori.items():
-                # se sono nella stessa stanze del giocatore
+                # se sono nella stessa stanza del giocatore
                 if giocatori[gid]["stanza"] == giocatori[id]["stanza"]:
                     # manda loro un messaggio dicendo ciò che ha detto il giocatore
                     mud.send_message(gid, "{} dice: {}".format(
@@ -158,10 +158,10 @@ while True:
         elif comando == "osserva":
 
             # memorizza la stanza corrente del giocatore
-            rm = stanze[giocatori[id]["stanza"]]
+            sta = stanze[giocatori[id]["stanza"]]
 
             # restituisce al giocatore la descriione della stanza corrente
-            mud.send_message(id, rm["descrizione"])
+            mud.send_message(id, sta["descrizione"])
 
             giocatoriqui = []
             # gestisci ogni giocatore nel gioco
@@ -179,19 +179,19 @@ while True:
 
             # manda al giocatore un messaggio con la lista delle uscite della stanza
             mud.send_message(id, "Le uscite sono: {}".format(
-                                                    ", ".join(rm["uscite"])))
+                                                    ", ".join(sta["uscite"])))
 
         # comando 'vai'
         elif comando == "vai":
 
             # memorizza il nome dell'uscita
-            usc = parametri.lower()
+            usc = parametri
 
             # memorizza la stanza corrente del giocatore
-            rm = stanze[giocatori[id]["stanza"]]
+            sta = stanze[giocatori[id]["stanza"]]
 
             # se l'uscita specificata fa parte della lista delle uscite
-            if usc in rm["uscite"]:
+            if usc in sta["uscite"]:
 
                 # gestisci ogni giocatore nel gioco
                 for gid, gio in giocatori.items():
@@ -201,28 +201,26 @@ while True:
                             and gid != id:
                         # mandagli un messaggio che dice che il giocatore
                         # ha lasciato la stanza
-                        mud.send_message(gid, "{} è andato via dall'uscita '{}'".format(
+                        mud.send_message(gid, "{} è andato via verso: '{}'".format(
                                                       giocatori[id]["nome"], usc))
 
                 # aggiorna la stanza corrente del giocatore a quella a cui porta l'uscita
-                giocatori[id]["stanza"] = rm["uscite"][usc]
-                rm = stanze[giocatori[id]["stanza"]]
+                giocatori[id]["stanza"] = usc
+                sta = stanze[usc]
 
                 # gestisci ogni giocatore nel gioco
                 for gid, gio in giocatori.items():
                     # se il giocatore è nella stessa (nuova) stanza e non è il
                     # giocatore che invia il comando
-                    if giocatori[gid]["stanza"] == giocatori[id]["stanza"] \
-                            and gid != id:
+                    if giocatori[gid]["stanza"] == usc and gid != id:
                         # mandagli un messaggio che dice che il giocatore
                         # è entrato nella stanza
                         mud.send_message(gid,
-                                         "{} è arrivato dall'uscita '{}'".format(
+                                         "{} è arrivato da: '{}'".format(
                                                       giocatori[id]["nome"], usc))
 
                 # manda al giocatore un messaggio che dice dove di trova ora
-                mud.send_message(id, "Sei arrivato in '{}'".format(
-                                                          giocatori[id]["stanza"]))
+                mud.send_message(id, "Sei arrivato in '{}'".format(usc))
 
             # l'uscita specificata non è stata trovata nella stanza
             else:
