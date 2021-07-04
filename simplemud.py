@@ -143,7 +143,7 @@ while True:
                 # se sono nella stessa stanze del giocatore
                 if giocatori[gid]["stanza"] == giocatori[id]["stanza"]:
                     # manda loro un messaggio dicendo ciò che ha detto il giocatore
-                    mud.send_message(gid, "{} says: {}".format(
+                    mud.send_message(gid, "{} dice: {}".format(
                                                 giocatori[id]["nome"], parametri))
 
         # comando 'osserva'
