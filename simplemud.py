@@ -23,21 +23,29 @@ traduzione italiana: Massimiliano De Ruosi - massimiliano.deruosi@gmail.com
 """
 
 import time
+import pickle
+import os
 
 # importa la classe: MUD server
 from mudserver import MudServer
 
-# struttura che definisce le stanze nel gioco. Prova ad aggiungere più stanze!
-stanze = {
-    "Taverna": {
-        "descrizione": "Sei in una confortevole taverna riscaldata da un caminetto",
-        "uscite": {"esterno": "Esterno"},
-    },
-    "Esterno": {
-        "descrizione": "Ti trovi fuori da una taverna. Sta piovendo.",
-        "uscite": {"interno": "Taverna"},
+# se esiste il file 'stanze.p' contenente il database delle stanze, aprilo
+if os.path.isfile("stanze.p"):
+    stanze = pickle.load( open( "stanze.p", "rb" ) )
+# ...altrimenti crea una struttura che definisce le stanze nel gioco e salvala
+# nel file 'stanze.p'
+else:
+    stanze = {
+        "Taverna": {
+            "descrizione": "Sei in una confortevole taverna riscaldata da un caminetto",
+            "uscite": {"esterno": "Esterno"},
+        },
+        "Esterno": {
+            "descrizione": "Ti trovi fuori da una taverna. Sta piovendo.",
+            "uscite": {"interno": "Taverna"},
+        }
     }
-}
+    pickle.dump( stanze, open( "stanze.p", "wb") )
 
 # memorizza i giocatori nel gioco
 giocatori = {}
