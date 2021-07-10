@@ -142,6 +142,10 @@ while True:
                                  + "circondario, ad es. 'osserva'")
             mud.send_message(id, "  vai <uscita>  - Muoviti verso l'uscita "
                                  + "specificata, ad es. 'vai esterno'")
+            mud.send_message(id, "  crea <stanza>  - Crea nella stanza corrente "
+                                 + "una nuova uscita che porta alla stanza indicata. "
+                                 + "Se la stanza non esiste ne crea una nuova "
+                                 + "ad es. 'crea Bosco'")
 
         # comando 'di'
         elif comando == "di":
@@ -226,6 +230,27 @@ while True:
             else:
                 # restiruisce un messaggio 'uscita sconosciuta'
                 mud.send_message(id, "Uscita sconosciuta: '{}'".format(usc))
+
+        # comando 'crea'
+        elif comando == "crea":
+            usc = parametri
+            # memorizza il nome della stanza corrente del giocatore
+            nome_sta = giocatori[id]["stanza"]
+            sta = stanze[nome_sta]
+            if usc in sta["uscite"]:
+                mud.send_message(id, "Impossibile creare l'uscita: '{}': esiste già!".format(usc))
+            else:
+                # aggiungo la nuova uscita alla stanza corrente
+                sta["uscite"].add(usc)
+                # controllo che la stanza destinazione dell'uscita non esista già: in quel caso
+                # il comando aggiunge semplicemente un nuovo percorso dalla stanza corrente...
+                if not usc in stanze:
+                    # ...se invece non esiste, creo la nuova stanza
+                    stanze[usc] = {"uscite":{nome_sta,}, "descrizione": 'Un posto sconosciuto'}
+                # rendo persistenti i cambiamenti
+                pickle.dump( stanze, open( "stanze.p", "wb") )
+                # avverto tutti i giocatori che è stata creata la nuova uscita.
+                mud.send_message(id, "Nella stanza '{}' è stata creata l'uscita: '{}'".format(nome_sta, usc))
 
         # qualche altro comando non riconosciuto
         else:
