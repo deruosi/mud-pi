@@ -146,7 +146,7 @@ while True:
                                  + "una nuova uscita che porta alla stanza indicata. "
                                  + "Se la stanza non esiste ne crea una nuova "
                                  + "ad es. 'crea Bosco'")
-            mud.send_message(id, "  descrivi <stanza>  - modifica la"
+            mud.send_message(id, "  descrivi <testo>  - modifica la"
                                  + "descrizione della stanza corrente, ad es. "
                                  + "'descrivi Un fitto bosco di faggio'")
 
