@@ -146,6 +146,9 @@ while True:
                                  + "una nuova uscita che porta alla stanza indicata. "
                                  + "Se la stanza non esiste ne crea una nuova "
                                  + "ad es. 'crea Bosco'")
+            mud.send_message(id, "  descrivi <stanza>  - modifica la"
+                                 + "descrizione della stanza corrente, ad es. "
+                                 + "'descrivi Un fitto bosco di faggio'")
 
         # comando 'di'
         elif comando == "di":
@@ -251,6 +254,22 @@ while True:
                 pickle.dump( stanze, open( "stanze.p", "wb") )
                 # avverto tutti i giocatori che è stata creata la nuova uscita.
                 mud.send_message(id, "Nella stanza '{}' è stata creata l'uscita: '{}'".format(nome_sta, usc))
+
+        # comando 'descrivi'
+        elif comando == "descrivi":
+            desc = parametri
+            # memorizza il nome della stanza corrente del giocatore
+            nome_sta = giocatori[id]["stanza"]
+            sta = stanze[nome_sta]
+            if len(desc) == 0:
+                mud.send_message(id, "Nessuna descrizione fornita!")
+            else:
+                # (sovra)scrive la descrizione della stanza corrente
+                sta["descrizione"] = desc
+                # rendo persistenti i cambiamenti
+                pickle.dump( stanze, open( "stanze.p", "wb") )
+                # avverto tutti i giocatori che è stata creata la nuova uscita.
+                mud.send_message(id, "Nella stanza '{}' la descrizione è cambiata".format(nome_sta, usc))
 
         # qualche altro comando non riconosciuto
         else:
