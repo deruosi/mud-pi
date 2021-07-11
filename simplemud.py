@@ -149,6 +149,7 @@ while True:
             mud.send_message(id, "  descrivi <testo>  - modifica la"
                                  + "descrizione della stanza corrente, ad es. "
                                  + "'descrivi Un fitto bosco di faggio'")
+            mud.send_message(id, "  cancella - cancella la stanza corrente")
 
         # comando 'di'
         elif comando == "di":
@@ -270,6 +271,27 @@ while True:
                 pickle.dump( stanze, open( "stanze.p", "wb") )
                 # avverto tutti i giocatori che è stata creata la nuova uscita.
                 mud.send_message(id, "Nella stanza '{}' la descrizione è cambiata".format(nome_sta, usc))
+
+        # comando 'cancella'
+        elif comando == "cancella":
+            # memorizza il nome della stanza corrente del giocatore
+            nome_sta = giocatori[id]["stanza"]
+            sta = stanze[nome_sta]
+            uscite = sta["uscite"]
+            if len(uscite) > 1:
+                mud.send_message(id, "Impossibile cancellare la stanza: c'è più di una uscita!")
+            else:
+                # aggiorna la stanza corrente del giocatore con l'unica uscita
+                for usc in uscite:
+                    giocatori[id]["stanza"] = usc
+                    stanze[usc]["uscite"].remove(nome_sta)
+                mud.send_message(id, "Sei stato trasportato nella stanza: '{}'".format(usc))
+                # elimino stanza corrente
+                del stanze[nome_sta]
+                # rendo persistenti i cambiamenti
+                pickle.dump( stanze, open( "stanze.p", "wb") )
+                # avverto tutti i giocatori che è stata cancellata la stanza
+                mud.send_message(id, "La stanza '{}' è stata cancellata".format(nome_sta))
 
         # qualche altro comando non riconosciuto
         else:
