@@ -37,7 +37,8 @@ if os.path.isfile("stanze.p"):
 else:
     stanze = {
         "Taverna": {
-            "descrizione": "Sei in una confortevole taverna riscaldata da un caminetto",
+            "descrizione": "Sei in una confortevole taverna " 
+            + "riscaldata da un caminetto",
             "uscite": {"Esterno",}
         },
         "Esterno": {
@@ -53,14 +54,16 @@ giocatori = {}
 # avvia il server
 mud = MudServer()
 
-# ciclo principale del gioco. Viene eseguito all'infinito (i.e. fino a quando il programma viene terminato)
+# ciclo principale del gioco. Viene eseguito all'infinito (i.e. fino a quando
+# il programma viene terminato)
 while True:
 
     # pausa per 1/5 di secondo a ogni ciclo, così non usiamo
     # costantemente il 100% della CPU
     time.sleep(0.2)
 
-    # 'update' deve essere chiamato durante il ciclo per mantenere il gioco attivo e con informazioni aggiornate
+    # 'update' deve essere chiamato durante il ciclo per mantenere il gioco
+    # attivo e con informazioni aggiornate
     mud.update()
 
     # gestisci i nuovi giocatori che si sono appena connessi
@@ -106,8 +109,8 @@ while True:
         if id not in giocatori:
             continue
 
-        # se un giocatore non ha ancora inserito un nome, usa questo primo comando
-        # come nome e spostalo nella stanza iniziale.
+        # se un giocatore non ha ancora inserito un nome, usa questo primo
+        # comando come nome e spostalo nella stanza iniziale.
         if giocatori[id]["nome"] is None:
 
             giocatori[id]["nome"] = comando
@@ -115,17 +118,18 @@ while True:
 
             # gestisci ogni giocatore nel gioco
             for gid, gio in giocatori.items():
-                # manda a tutti i giocatori un messaggio per informarli dell'ingresso
-                # del nuovo giocatore
+                # manda a tutti i giocatori un messaggio per informarli
+                # dell'ingresso del nuovo giocatore
                 mud.send_message(gid, "{} è entrato nel gioco".format(
                                                         giocatori[id]["nome"]))
 
             # manda al nuovo giocatore un messaggio di benvenuto
             mud.send_message(id, "Benvenuto nel gioco, {}. ".format(
-                                                           giocatori[id]["nome"])
-                             + "Scrivi 'aiuto' per una lista dei comandi. Buon divertimento!")
+                                                    giocatori[id]["nome"])
+                + "Scrivi 'aiuto' per una lista dei comandi. "
+                + "Buon divertimento!")
 
-            # manda al nuovo giocatore la descrizione della stanza in cui si trova
+            # manda al nuovo giocatore la descrizione della stanza corrente
             mud.send_message(id, stanze[giocatori[id]["stanza"]]["descrizione"])
 
         # ogni possibile comando è gestito sotto. Prova ad aggiungere
@@ -136,19 +140,19 @@ while True:
 
             # restituisce al giocatore la lista dei comandi possibili
             mud.send_message(id, "Comandi:")
-            mud.send_message(id, "  di <messaggio>  - di' qualcosa ad alta voce, "
-                                 + "ad es. 'di Ciao'")
-            mud.send_message(id, "  osserva       - Esamina il "
-                                 + "circondario, ad es. 'osserva'")
-            mud.send_message(id, "  vai <uscita>  - Muoviti verso l'uscita "
-                                 + "specificata, ad es. 'vai esterno'")
-            mud.send_message(id, "  crea <stanza>  - Crea nella stanza corrente "
-                                 + "una nuova uscita che porta alla stanza indicata. "
-                                 + "Se la stanza non esiste ne crea una nuova "
-                                 + "ad es. 'crea Bosco'")
+            mud.send_message(id, "  di <messaggio>    - di' qualcosa ad alta "
+                + "voce, ad es. 'di Ciao'")
+            mud.send_message(id, "  osserva           - Esamina il "
+                + "circondario, ad es. 'osserva'")
+            mud.send_message(id, "  vai <uscita>      - Muoviti verso l'uscita "
+                + "specificata, ad es. 'vai esterno'")
+            mud.send_message(id, "  crea <stanza>     - Crea nella stanza "
+                + "corrente una nuova uscita che porta alla stanza indicata. "
+                + "Se la stanza non esiste ne crea una nuova, ad es. "
+                + "'crea Bosco'")
             mud.send_message(id, "  descrivi <testo>  - modifica la"
-                                 + "descrizione della stanza corrente, ad es. "
-                                 + "'descrivi Un fitto bosco di faggio'")
+                + "descrizione della stanza corrente, ad es. 'descrivi Un "
+                + "fitto bosco di faggio'")
             mud.send_message(id, "  cancella - cancella la stanza corrente")
 
         # comando 'di'
@@ -158,9 +162,10 @@ while True:
             for gid, gio in giocatori.items():
                 # se sono nella stessa stanza del giocatore
                 if giocatori[gid]["stanza"] == giocatori[id]["stanza"]:
-                    # manda loro un messaggio dicendo ciò che ha detto il giocatore
+                    # manda loro un messaggio dicendo ciò che ha detto il
+                    # giocatore
                     mud.send_message(gid, "{} dice: {}".format(
-                                                giocatori[id]["nome"], parametri))
+                        giocatori[id]["nome"], parametri))
 
         # comando 'osserva'
         elif comando == "osserva":
@@ -181,13 +186,15 @@ while True:
                         # aggiunge il loro nome alla lista
                         giocatoriqui.append(giocatori[gid]["nome"])
 
-            # manda al giocatore un messaggio con la lista dei giocatori nella stanza
+            # manda al giocatore un messaggio con la lista dei giocatori nella
+            # stanza
             mud.send_message(id, "Giocatori qui: {}".format(
-                                                    ", ".join(giocatoriqui)))
+                ", ".join(giocatoriqui)))
 
-            # manda al giocatore un messaggio con la lista delle uscite della stanza
+            # manda al giocatore un messaggio con la lista delle uscite della
+            # stanza
             mud.send_message(id, "Le uscite sono: {}".format(
-                                                    ", ".join(sta["uscite"])))
+                ", ".join(sta["uscite"])))
 
         # comando 'vai'
         elif comando == "vai":
@@ -209,10 +216,13 @@ while True:
                             and gid != id:
                         # mandagli un messaggio che dice che il giocatore
                         # ha lasciato la stanza
-                        mud.send_message(gid, "{} è andato via verso: '{}'".format(
-                                                      giocatori[id]["nome"], usc))
+                        mud.send_message(
+                            gid,
+                            "{} è andato via verso: '{}'".format(
+                                giocatori[id]["nome"], usc))
 
-                # aggiorna la stanza corrente del giocatore a quella a cui porta l'uscita
+                # aggiorna la stanza corrente del giocatore a quella a cui
+                # porta l'uscita
                 giocatori[id]["stanza"] = usc
                 sta = stanze[usc]
 
@@ -223,9 +233,10 @@ while True:
                     if giocatori[gid]["stanza"] == usc and gid != id:
                         # mandagli un messaggio che dice che il giocatore
                         # è entrato nella stanza
-                        mud.send_message(gid,
-                                         "{} è arrivato da: '{}'".format(
-                                                      giocatori[id]["nome"], usc))
+                        mud.send_message(
+                            gid,
+                            "{} è arrivato da: '{}'".format(
+                                giocatori[id]["nome"], usc))
 
                 # manda al giocatore un messaggio che dice dove di trova ora
                 mud.send_message(id, "Sei arrivato in '{}'".format(usc))
@@ -242,19 +253,24 @@ while True:
             nome_sta = giocatori[id]["stanza"]
             sta = stanze[nome_sta]
             if usc in sta["uscite"]:
-                mud.send_message(id, "Impossibile creare l'uscita: '{}': esiste già!".format(usc))
+                mud.send_message(id, "Impossibile creare "
+                    + "l'uscita: '{}': esiste già!".format(usc))
             else:
                 # aggiungo la nuova uscita alla stanza corrente
                 sta["uscite"].add(usc)
-                # controllo che la stanza destinazione dell'uscita non esista già: in quel caso
-                # il comando aggiunge semplicemente un nuovo percorso dalla stanza corrente...
+                # controllo che la stanza destinazione dell'uscita non esista
+                # già: in quel caso il comando aggiunge semplicemente un nuovo
+                # percorso dalla stanza corrente...
                 if not usc in stanze:
                     # ...se invece non esiste, creo la nuova stanza
-                    stanze[usc] = {"uscite":{nome_sta,}, "descrizione": 'Un posto sconosciuto'}
+                    stanze[usc] = {
+                        "uscite":{nome_sta,},
+                        "descrizione": 'Un posto sconosciuto'}
                 # rendo persistenti i cambiamenti
                 pickle.dump( stanze, open( "stanze.p", "wb") )
                 # avverto tutti i giocatori che è stata creata la nuova uscita.
-                mud.send_message(id, "Nella stanza '{}' è stata creata l'uscita: '{}'".format(nome_sta, usc))
+                mud.send_message(id, "Nella stanza '{}'".format(nome_sta)
+                    + " è stata creata l'uscita: '{}'".format(usc))
 
         # comando 'descrivi'
         elif comando == "descrivi":
@@ -270,7 +286,8 @@ while True:
                 # rendo persistenti i cambiamenti
                 pickle.dump( stanze, open( "stanze.p", "wb") )
                 # avverto tutti i giocatori che è stata creata la nuova uscita.
-                mud.send_message(id, "Nella stanza '{}' la descrizione è cambiata".format(nome_sta, usc))
+                mud.send_message(id, "Nella stanza '{}'".format(nome_sta)
+                    + "la descrizione è cambiata")
 
         # comando 'cancella'
         elif comando == "cancella":
@@ -279,19 +296,22 @@ while True:
             sta = stanze[nome_sta]
             uscite = sta["uscite"]
             if len(uscite) > 1:
-                mud.send_message(id, "Impossibile cancellare la stanza: c'è più di una uscita!")
+                mud.send_message(id, "Impossibile cancellare la stanza: c'è "
+                    + "più di una uscita!")
             else:
                 # aggiorna la stanza corrente del giocatore con l'unica uscita
                 for usc in uscite:
                     giocatori[id]["stanza"] = usc
                     stanze[usc]["uscite"].remove(nome_sta)
-                mud.send_message(id, "Sei stato trasportato nella stanza: '{}'".format(usc))
+                mud.send_message(id,
+                    "Sei stato trasportato nella stanza: '{}'".format(usc))
                 # elimino stanza corrente
                 del stanze[nome_sta]
                 # rendo persistenti i cambiamenti
                 pickle.dump( stanze, open( "stanze.p", "wb") )
                 # avverto tutti i giocatori che è stata cancellata la stanza
-                mud.send_message(id, "La stanza '{}' è stata cancellata".format(nome_sta))
+                mud.send_message(id,
+                    "La stanza '{}' è stata cancellata".format(nome_sta))
 
         # qualche altro comando non riconosciuto
         else:
