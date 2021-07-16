@@ -153,7 +153,8 @@ while True:
             mud.send_message(id, "  descrivi <testo>  - modifica la"
                 + "descrizione della stanza corrente, ad es. 'descrivi Un "
                 + "fitto bosco di faggio'")
-            mud.send_message(id, "  cancella - cancella la stanza corrente")
+            mud.send_message(id, "  cancella          - cancella la stanza "
+                + "corrente")
 
         # comando 'di'
         elif comando == "di":
