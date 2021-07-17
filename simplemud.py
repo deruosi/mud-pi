@@ -71,7 +71,7 @@ while True:
 
         # aggiungi i nuovi giocatori al dizinario, notare che non hanno
         # ancora un nome.
-        # La chiave dek dizionario è il numero id del giocatore. Impostiamo
+        # La chiave del dizionario è il numero id del giocatore. Impostiamo
         # la loro stanza a None inizialmente finché non hanno inserito un nome
         # Prova ad aggiungere ulteriori statistiche del giocatore - livello,
         # oro, inventario, ecc.
