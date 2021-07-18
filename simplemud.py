@@ -39,11 +39,13 @@ else:
         "Taverna": {
             "descrizione": "Sei in una confortevole taverna " 
             + "riscaldata da un caminetto",
-            "uscite": {"Esterno",}
+            "uscite": {"Esterno",},
+            "zona": "città"
         },
         "Esterno": {
             "descrizione": "Ti trovi fuori da una taverna. Sta piovendo.",
-            "uscite": {"Taverna",}
+            "uscite": {"Taverna",},
+            "zona": "strada"
         }
     }
     pickle.dump( stanze, open( "stanze.p", "wb") )
@@ -62,6 +64,15 @@ if os.path.isfile("registro_giocatori.p"):
 else:
     registro_giocatori = {}
     pickle.dump(registro_giocatori, open( "registro_giocatori.p", "wb") )
+
+bestiario = {
+    "ratto gigante": {"zone": {"strada", "dungeon"}},
+    "lupo selvatico": {"zone": {"foresta"}},
+    "scheletro": {"zone": {"dungeon"}},
+}
+
+# inizializza il timer che scandisce la creazione di nuove creature nelle stanze
+timer_creature = 0
 
 # avvia il server
 mud = MudServer()
@@ -112,6 +123,36 @@ while True:
 
         # rimuove il giocatore dal dizionario dei giocatori
         del(giocatori[id])
+
+    # gestisci la creazione delle creature. Scelte e design:
+    # 1) la creatura è vincolata alla stanza, massimo una creatura per stanza
+    # 2) le stanze appartengono a determinate zone, ogni tipo di creatura
+    #    compare solo in determinate zone
+    # 3) le creature non sono persistenti
+    for nome_sta, sta in stanze.items():
+        # se nella stanza c'è già una creatura, non ne aggiungo altre
+        if "creatura" in sta.keys() and sta["creatura"]:
+            pass
+        else:
+            for tipo, creatura in bestiario.items():
+                # se: 1) la stanza ha una zona
+                #     2) la zona della stanza fa parte di quelle della creatura
+                #     3) il timer per la creazione delle creature è superato
+                #        (es. con cicli di 0.2s, 30*5 = 30s)
+                if ("zona" in sta.keys()
+                        and sta["zona"] in creatura["zone"]
+                        and timer_creature > 30*5):
+                    # aggiungo la creatura alla stanza
+                    sta["creatura"] = {"tipo": tipo}
+                    timer_creature = 0
+                    # gestisci ogni giocatore nel gioco
+                    for gid, gio in giocatori.items():
+                        # se sono nella stessa stanza di un giocatore...
+                        if nome_sta == giocatori[gid]["stanza"]:
+                            # ...gli annuncio la comparsa della creatura
+                            mud.send_message(
+                                gid, "una creatura è apparsa all'improvviso!")
+    timer_creature += 1
 
     # gestisci ogni nuovo comando mandato dai giocatori
     for id, comando, parametri in mud.get_commands():
@@ -210,6 +251,12 @@ while True:
             # stanza
             mud.send_message(id, "Giocatori qui: {}".format(
                 ", ".join(giocatoriqui)))
+
+            # manda al giocatore un messaggio con il nome della creatura nella
+            # stanza, se presente
+            if "creatura" in sta.keys() and sta["creatura"]:
+                mud.send_message(id, "Creature qui: {}".format(
+                    sta["creatura"]["tipo"]))
 
             # manda al giocatore un messaggio con la lista delle uscite della
             # stanza
