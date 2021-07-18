@@ -215,6 +215,9 @@ while True:
                 + "fitto bosco di faggio'")
             mud.send_message(id, "  cancella          - cancella la stanza "
                 + "corrente")
+            mud.send_message(id, "  zona              - visualizza o cambia la "
+                + "zona della stanza corrente, ad es. 'zona', oppure: "
+                + "'zona città'")
 
         # comando 'di'
         elif comando == "di":
@@ -360,6 +363,26 @@ while True:
                 # avverto tutti i giocatori che è stata creata la nuova uscita.
                 mud.send_message(id, "Nella stanza '{}'".format(nome_sta)
                     + "la descrizione è cambiata")
+
+        # comando 'zona'
+        elif comando == "zona":
+            nome_zona = parametri
+            # memorizza il nome della stanza corrente del giocatore
+            nome_sta = giocatori[id]["stanza"]
+            sta = stanze[nome_sta]
+            if len(nome_zona) == 0:
+                if "zona" in sta.keys() and sta["zona"]:
+                    mud.send_message(id, "zona: {}".format(sta["zona"]))
+                else:
+                    mud.send_message(id, "nessuna zona definita per la stanza")
+            else:
+                # (sovra)scrive la zona della stanza corrente
+                sta["zona"] = nome_zona
+                # rendo persistenti i cambiamenti
+                pickle.dump( stanze, open( "stanze.p", "wb") )
+                # avverto il giocatore che la zona è cambiata
+                mud.send_message(id, "La stanza '{}' ora ".format(nome_sta)
+                    + "appartiene alla zona: '{}'".format(nome_zona))
 
         # comando 'cancella'
         elif comando == "cancella":
