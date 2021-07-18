@@ -48,8 +48,20 @@ else:
     }
     pickle.dump( stanze, open( "stanze.p", "wb") )
 
-# memorizza i giocatori nel gioco
+# 'giocatori' contiene i giocatori connessi nel gioco, la key è l'id della
+# connessione, es.: {0: {"nome": "max", "stanza": "Taverna"}, ...}
+# 'registro_giocatori' contiene i giocatori registrati, la key è il nome del
+# giocatore, ad es. {"max": {"stanza": "Taverna"}, ...}
 giocatori = {}
+# se esiste il file 'registro_giocatori.p' contenente il database dei giocatori
+# registrati, aprilo
+if os.path.isfile("registro_giocatori.p"):
+    registro_giocatori = pickle.load(open( "registro_giocatori.p", "rb" ) )
+# ...altrimenti crea e salva il registro vuoto, che verrà popolato non appena
+# si connetteranno i primi giocatori
+else:
+    registro_giocatori = {}
+    pickle.dump(registro_giocatori, open( "registro_giocatori.p", "wb") )
 
 # avvia il server
 mud = MudServer()
@@ -110,12 +122,19 @@ while True:
             continue
 
         # se un giocatore non ha ancora inserito un nome, usa questo primo
-        # comando come nome e spostalo nella stanza iniziale.
+        # comando come nome e verifica se fa parte dei giocatori registrati
         if giocatori[id]["nome"] is None:
 
             giocatori[id]["nome"] = comando
-            giocatori[id]["stanza"] = "Taverna"
-
+            # se il giocatore non viene trovato nel registro, va aggiunto
+            if comando not in registro_giocatori.keys():
+                registro_giocatori[comando] = {"stanza": "Taverna"}
+                pickle.dump(
+                    registro_giocatori,
+                    open( "registro_giocatori.p", "wb") )
+            # aggiorna i dati del giocatore connesso copiandoli dal registro
+            giocatori[id]["stanza"] = registro_giocatori[comando]["stanza"]
+            
             # gestisci ogni giocatore nel gioco
             for gid, gio in giocatori.items():
                 # manda a tutti i giocatori un messaggio per informarli
@@ -225,6 +244,11 @@ while True:
                 # aggiorna la stanza corrente del giocatore a quella a cui
                 # porta l'uscita
                 giocatori[id]["stanza"] = usc
+                registro_giocatori[giocatori[id]["nome"]]["stanza"] = usc
+                pickle.dump(
+                    registro_giocatori,
+                    open( "registro_giocatori.p", "wb") )
+
                 sta = stanze[usc]
 
                 # gestisci ogni giocatore nel gioco
