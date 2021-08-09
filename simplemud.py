@@ -92,7 +92,7 @@ while True:
     # gestisci i nuovi giocatori che si sono appena connessi
     for id in mud.get_new_players():
 
-        # aggiungi i nuovi giocatori al dizinario, notare che non hanno
+        # aggiungi i nuovi giocatori al dizionario, notare che non hanno
         # ancora un nome.
         # La chiave del dizionario è il numero id del giocatore. Impostiamo
         # la loro stanza a None inizialmente finché non hanno inserito un nome
@@ -126,8 +126,8 @@ while True:
 
     # gestisci la creazione delle creature. Scelte e design:
     # 1) la creatura è vincolata alla stanza, massimo una creatura per stanza
-    # 2) le stanze appartengono a determinate zone, ogni tipo di creatura
-    #    compare solo in determinate zone
+    # 2) ogni stanza appartiene a una zona
+    # 3) ogni tipo di creatura compare solo in determinate zone
     # 3) le creature non sono persistenti
     for nome_sta, sta in stanze.items():
         # se nella stanza c'è già una creatura, non ne aggiungo altre
