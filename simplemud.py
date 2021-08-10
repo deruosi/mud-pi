@@ -25,6 +25,7 @@ traduzione italiana: Massimiliano De Ruosi - massimiliano.deruosi@gmail.com
 import time
 import pickle
 import os
+from random import choice
 
 # importa la classe: MUD server
 from mudserver import MudServer
@@ -134,24 +135,25 @@ while True:
         if "creatura" in sta.keys() and sta["creatura"]:
             pass
         else:
-            for tipo, creatura in bestiario.items():
-                # se: 1) la stanza ha una zona
-                #     2) la zona della stanza fa parte di quelle della creatura
-                #     3) il timer per la creazione delle creature è superato
-                #        (es. con cicli di 0.2s, 30*5 = 30s)
-                if ("zona" in sta.keys()
-                        and sta["zona"] in creatura["zone"]
-                        and timer_creature > 30*5):
-                    # aggiungo la creatura alla stanza
-                    sta["creatura"] = {"tipo": tipo}
-                    timer_creature = 0
-                    # gestisci ogni giocatore nel gioco
-                    for gid, gio in giocatori.items():
-                        # se sono nella stessa stanza di un giocatore...
-                        if nome_sta == giocatori[gid]["stanza"]:
-                            # ...gli annuncio la comparsa della creatura
-                            mud.send_message(
-                                gid, "una creatura è apparsa all'improvviso!")
+            # scelgo una creatura a caso nel bestiario
+            tipo, creatura = choice(list(bestiario.items()))
+            # se: 1) la stanza ha una zona
+            #     2) la zona della stanza fa parte di quelle della creatura
+            #     3) il timer per la creazione delle creature è superato
+            #        (es. con cicli di 0.2s, 30*5 = 30s)
+            if ("zona" in sta.keys()
+                    and sta["zona"] in creatura["zone"]
+                    and timer_creature > 30*5):
+                # aggiungo la creatura alla stanza
+                sta["creatura"] = {"tipo": tipo}
+                timer_creature = 0
+                # gestisci ogni giocatore nel gioco
+                for gid, gio in giocatori.items():
+                    # se sono nella stessa stanza di un giocatore...
+                    if nome_sta == giocatori[gid]["stanza"]:
+                        # ...gli annuncio la comparsa della creatura
+                        mud.send_message(
+                            gid, "una creatura è apparsa all'improvviso!")
     timer_creature += 1
 
     # gestisci ogni nuovo comando mandato dai giocatori
