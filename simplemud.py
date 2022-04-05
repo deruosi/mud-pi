@@ -271,57 +271,62 @@ while True:
         # comando 'vai'
         elif comando == "vai":
 
-            # memorizza il nome dell'uscita
-            usc = parametri
+            # memorizza il nome dell'uscita richiesta dal giocatore
+            usc_ric = parametri
 
             # memorizza la stanza corrente del giocatore
             sta = stanze[giocatori[id]["stanza"]]
 
-            # se l'uscita specificata fa parte della lista delle uscite
-            if usc in sta["uscite"]:
+            # confronta l'uscita richiesta con ogni uscita disponibile
+            usc_valida = False
+            for usc_dis in sta["uscite"]:
 
-                # gestisci ogni giocatore nel gioco
-                for gid, gio in giocatori.items():
-                    # se il giocatore è nella stessa stanza e non è
-                    # il giocatore che invia il comando
-                    if giocatori[gid]["stanza"] == giocatori[id]["stanza"] \
-                            and gid != id:
-                        # mandagli un messaggio che dice che il giocatore
-                        # ha lasciato la stanza
-                        mud.send_message(
-                            gid,
-                            "{} è andato via verso: '{}'".format(
-                                giocatori[id]["nome"], usc))
+                # se l'uscita richiesta è uguale a (o contenuta in) una
+                # delle uscite della stanza
+                if len(usc_ric) > 0 and usc_ric.lower() in usc_dis.lower():
 
-                # aggiorna la stanza corrente del giocatore a quella a cui
-                # porta l'uscita
-                giocatori[id]["stanza"] = usc
-                registro_giocatori[giocatori[id]["nome"]]["stanza"] = usc
-                pickle.dump(
-                    registro_giocatori,
-                    open( "registro_giocatori.p", "wb") )
+                    # gestisci ogni giocatore nel gioco
+                    for gid, gio in giocatori.items():
+                        # se il giocatore è nella stessa stanza e non è
+                        # il giocatore che invia il comando
+                        if giocatori[gid]["stanza"] == giocatori[id]["stanza"] \
+                                and gid != id:
+                            # mandagli un messaggio che dice che il giocatore
+                            # ha lasciato la stanza
+                            mud.send_message(
+                                gid,
+                                "{} è andato via verso: '{}'".format(
+                                    giocatori[id]["nome"], usc_dis))
 
-                sta = stanze[usc]
+                    # aggiorna la stanza corrente del giocatore a quella a cui
+                    # porta l'uscita
+                    giocatori[id]["stanza"] = usc_dis
+                    registro_giocatori[giocatori[id]["nome"]]["stanza"] = usc_dis
+                    pickle.dump(
+                        registro_giocatori,
+                        open( "registro_giocatori.p", "wb") )
 
-                # gestisci ogni giocatore nel gioco
-                for gid, gio in giocatori.items():
-                    # se il giocatore è nella stessa (nuova) stanza e non è il
-                    # giocatore che invia il comando
-                    if giocatori[gid]["stanza"] == usc and gid != id:
-                        # mandagli un messaggio che dice che il giocatore
-                        # è entrato nella stanza
-                        mud.send_message(
-                            gid,
-                            "{} è arrivato da: '{}'".format(
-                                giocatori[id]["nome"], usc))
+                    sta = stanze[usc_dis]
+                    usc_valida = True
 
-                # manda al giocatore un messaggio che dice dove di trova ora
-                mud.send_message(id, "Sei arrivato in '{}'".format(usc))
+                    # gestisci ogni giocatore nel gioco
+                    for gid, gio in giocatori.items():
+                        # se il giocatore è nella stessa (nuova) stanza e non è il
+                        # giocatore che invia il comando
+                        if giocatori[gid]["stanza"] == usc_dis and gid != id:
+                            # mandagli un messaggio che dice che il giocatore
+                            # è entrato nella stanza
+                            mud.send_message(
+                                gid,
+                                "{} è arrivato da: '{}'".format(
+                                    giocatori[id]["nome"], usc_dis))
 
-            # l'uscita specificata non è stata trovata nella stanza
-            else:
-                # restiruisce un messaggio 'uscita sconosciuta'
-                mud.send_message(id, "Uscita sconosciuta: '{}'".format(usc))
+                    # manda al giocatore un messaggio che dice dove di trova ora
+                    mud.send_message(id, "Sei arrivato in '{}'".format(usc_dis))
+
+            # se l'uscita richiesta non è stata trovata nella stanza:
+            if not usc_valida:
+                mud.send_message(id, "Dove vorresti andare esattamente?!?")
 
         # comando 'crea'
         elif comando == "crea":
